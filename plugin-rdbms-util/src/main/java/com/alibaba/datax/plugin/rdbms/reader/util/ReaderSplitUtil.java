@@ -40,7 +40,11 @@ public final class ReaderSplitUtil {
 
             Configuration connConf = Configuration.from(conns.get(i).toString());
             String jdbcUrl = connConf.getString(Key.JDBC_URL);
+            String jdbcJarUrl = connConf.getString(Key.JDBC_JAR_URL);
+            String driverName = connConf.getString(Key.DRIVER_NAME);
             sliceConfig.set(Key.JDBC_URL, jdbcUrl);
+            sliceConfig.set(Key.JDBC_JAR_URL, jdbcJarUrl);
+            sliceConfig.set(Key.DRIVER_NAME, driverName);
 
             // 抽取 jdbcUrl 中的 ip/port 进行资源使用的打标，以提供给 core 做有意义的 shuffle 操作
             sliceConfig.set(CommonConstant.LOAD_BALANCE_RESOURCE_MARK, DataBaseType.parseIpFromJdbcUrl(jdbcUrl));
@@ -66,7 +70,7 @@ public final class ReaderSplitUtil {
                         //原来:如果是单表的，主键切分num=num*2+1
                         // splitPk is null这类的情况的数据量本身就比真实数据量少很多, 和channel大小比率关系时，不建议考虑
                         //eachTableShouldSplittedNumber = eachTableShouldSplittedNumber * 2 + 1;// 不应该加1导致长尾
-                        
+
                         //考虑其他比率数字?(splitPk is null, 忽略此长尾)
                         eachTableShouldSplittedNumber = eachTableShouldSplittedNumber * 5;
                     }
@@ -84,7 +88,7 @@ public final class ReaderSplitUtil {
                     for (String table : tables) {
                         tempSlice = sliceConfig.clone();
                         tempSlice.set(Key.TABLE, table);
-                        String queryColumn = HintUtil.buildQueryColumn(jdbcUrl, table, column);
+                        String queryColumn = HintUtil.buildQueryColumn(jdbcUrl, driverName, jdbcJarUrl, table, column);
                         tempSlice.set(Key.QUERY_SQL, SingleTableSplitUtil.buildQuerySql(queryColumn, table, where));
                         splittedConfigs.add(tempSlice);
                     }

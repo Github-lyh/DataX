@@ -15,5 +15,7 @@ public enum SupportHiveDataType {
     VARCHAR,
     CHAR,
 
-    BOOLEAN
+    BOOLEAN,
+
+    BINARY
 }

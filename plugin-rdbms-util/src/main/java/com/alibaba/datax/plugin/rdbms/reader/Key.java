@@ -6,17 +6,21 @@ package com.alibaba.datax.plugin.rdbms.reader;
 public final class Key {
     public final static String JDBC_URL = "jdbcUrl";
 
+    public final static String JDBC_JAR_URL = "jdbcJarUrl";
+
+    public final static String DRIVER_NAME = "driverName";
+
     public final static String USERNAME = "username";
 
     public final static String PASSWORD = "password";
 
     public final static String TABLE = "table";
-    
+
     public final static String MANDATORY_ENCODING = "mandatoryEncoding";
 
     // 是数组配置
     public final static String COLUMN = "column";
-    
+
     public final static String COLUMN_LIST = "columnList";
 
     public final static String WHERE = "where";
@@ -24,9 +28,9 @@ public final class Key {
     public final static String HINT = "hint";
 
     public final static String SPLIT_PK = "splitPk";
-    
+
     public final static String SPLIT_MODE = "splitMode";
-    
+
     public final static String SAMPLE_PERCENTAGE = "samplePercentage";
 
     public final static String QUERY_SQL = "querySql";

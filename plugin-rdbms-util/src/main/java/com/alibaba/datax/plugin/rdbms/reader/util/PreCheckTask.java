@@ -41,10 +41,12 @@ public class PreCheckTask implements Callable<Boolean>{
     @Override
     public Boolean call() throws DataXException {
         String jdbcUrl = this.connection.getString(Key.JDBC_URL);
+        String jdbcJarUrl = this.connection.getString(Key.JDBC_JAR_URL);
+        String driverName = this.connection.getString(Key.DRIVER_NAME);
         List<Object> querySqls = this.connection.getList(Key.QUERY_SQL, Object.class);
         List<Object> splitPkSqls = this.connection.getList(Key.SPLIT_PK_SQL, Object.class);
         List<Object> tables = this.connection.getList(Key.TABLE,Object.class);
-        Connection conn = DBUtil.getConnectionWithoutRetry(this.dataBaseType, jdbcUrl,
+        Connection conn = DBUtil.getConnectionWithoutRetry(this.dataBaseType, jdbcUrl, driverName, jdbcJarUrl,
                 this.userName, password);
         int fetchSize = 1;
         if(DataBaseType.MySql.equals(dataBaseType) || DataBaseType.DRDS.equals(dataBaseType)) {

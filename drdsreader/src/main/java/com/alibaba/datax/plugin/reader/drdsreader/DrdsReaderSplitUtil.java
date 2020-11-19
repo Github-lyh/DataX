@@ -88,6 +88,8 @@ public class DrdsReaderSplitUtil {
         Map<String, List<String>> topology = new HashMap<String, List<String>>();
 
         String jdbcURL = configuration.getString(Key.JDBC_URL);
+        String jdbcJarUrl = configuration.getString(Key.JDBC_JAR_URL);
+        String driverName = configuration.getString(Key.DRIVER_NAME);
         String username = configuration.getString(Key.USERNAME);
         String password = configuration.getString(Key.PASSWORD);
         String logicTable = configuration.getString(Key.TABLE).trim();
@@ -95,7 +97,7 @@ public class DrdsReaderSplitUtil {
         Connection conn = null;
         ResultSet rs = null;
         try {
-            conn = DBUtil.getConnection(DataBaseType.DRDS, jdbcURL, username, password);
+            conn = DBUtil.getConnection(DataBaseType.DRDS, jdbcURL, driverName, jdbcJarUrl, username, password);
             rs = DBUtil.query(conn, "SHOW TOPOLOGY " + logicTable);
             while (DBUtil.asyncResultSetNext(rs)) {
                 String groupName = rs.getString("GROUP_NAME");

@@ -126,6 +126,8 @@ public class CommonRdbmsReader {
         private String username;
         private String password;
         private String jdbcUrl;
+        private String jdbcJarUrl;
+        private String driverName;
         private String mandatoryEncoding;
 
         // 作为日志显示信息时，需要附带的通用信息。比如信息所对应的数据库连接等信息，针对哪个表做的操作
@@ -148,6 +150,9 @@ public class CommonRdbmsReader {
             this.username = readerSliceConfig.getString(Key.USERNAME);
             this.password = readerSliceConfig.getString(Key.PASSWORD);
             this.jdbcUrl = readerSliceConfig.getString(Key.JDBC_URL);
+            this.jdbcJarUrl = readerSliceConfig.getString(Key.JDBC_JAR_URL);
+            this.driverName = readerSliceConfig.getString(Key.DRIVER_NAME);
+
 
             //ob10的处理
             if (this.jdbcUrl.startsWith(com.alibaba.datax.plugin.rdbms.writer.Constant.OB10_SPLIT_STRING) && this.dataBaseType == DataBaseType.MySql) {
@@ -182,7 +187,7 @@ public class CommonRdbmsReader {
             PerfRecord queryPerfRecord = new PerfRecord(taskGroupId,taskId, PerfRecord.PHASE.SQL_QUERY);
             queryPerfRecord.start();
 
-            Connection conn = DBUtil.getConnection(this.dataBaseType, jdbcUrl,
+            Connection conn = DBUtil.getConnection(this.dataBaseType, jdbcUrl, driverName, jdbcJarUrl,
                     username, password);
 
             // session config .etc related
@@ -230,11 +235,11 @@ public class CommonRdbmsReader {
         public void destroy(Configuration originalConfig) {
             // do nothing
         }
-        
-        protected Record transportOneRecord(RecordSender recordSender, ResultSet rs, 
-                ResultSetMetaData metaData, int columnNumber, String mandatoryEncoding, 
+
+        protected Record transportOneRecord(RecordSender recordSender, ResultSet rs,
+                ResultSetMetaData metaData, int columnNumber, String mandatoryEncoding,
                 TaskPluginCollector taskPluginCollector) {
-            Record record = buildRecord(recordSender,rs,metaData,columnNumber,mandatoryEncoding,taskPluginCollector); 
+            Record record = buildRecord(recordSender,rs,metaData,columnNumber,mandatoryEncoding,taskPluginCollector);
             recordSender.sendToWriter(record);
             return record;
         }
@@ -256,7 +261,7 @@ public class CommonRdbmsReader {
                         if(StringUtils.isBlank(mandatoryEncoding)){
                             rawData = rs.getString(i);
                         }else{
-                            rawData = new String((rs.getBytes(i) == null ? EMPTY_CHAR_ARRAY : 
+                            rawData = new String((rs.getBytes(i) == null ? EMPTY_CHAR_ARRAY :
                                 rs.getBytes(i)), mandatoryEncoding);
                         }
                         record.addColumn(new StringColumn(rawData));

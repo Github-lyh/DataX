@@ -3,6 +3,10 @@ package com.alibaba.datax.plugin.rdbms.writer;
 public final class Key {
     public final static String JDBC_URL = "jdbcUrl";
 
+    public final static String JDBC_JAR_URL = "jdbcJarUrl";
+
+    public final static String DRIVER_NAME = "driverName";
+
     public final static String USERNAME = "username";
 
     public final static String PASSWORD = "password";

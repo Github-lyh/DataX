@@ -68,15 +68,17 @@ public class CommonRdbmsWriter {
             for (int i = 0, len = connections.size(); i < len; i++) {
                 Configuration connConf = Configuration.from(connections.get(i).toString());
                 String jdbcUrl = connConf.getString(Key.JDBC_URL);
+                String jdbcJarUrl = connConf.getString(Key.JDBC_JAR_URL);
+                String driverName = connConf.getString(Key.DRIVER_NAME);
                 List<String> expandedTables = connConf.getList(Key.TABLE, String.class);
-                boolean hasInsertPri = DBUtil.checkInsertPrivilege(dataBaseType, jdbcUrl, username, password, expandedTables);
+                boolean hasInsertPri = DBUtil.checkInsertPrivilege(dataBaseType, jdbcUrl, driverName, jdbcJarUrl, username, password, expandedTables);
 
                 if (!hasInsertPri) {
                     throw RdbmsException.asInsertPriException(dataBaseType, originalConfig.getString(Key.USERNAME), jdbcUrl);
                 }
 
                 if (DBUtil.needCheckDeletePrivilege(originalConfig)) {
-                    boolean hasDeletePri = DBUtil.checkDeletePrivilege(dataBaseType, jdbcUrl, username, password, expandedTables);
+                    boolean hasDeletePri = DBUtil.checkDeletePrivilege(dataBaseType, jdbcUrl, driverName, jdbcJarUrl, username, password, expandedTables);
                     if (!hasDeletePri) {
                         throw RdbmsException.asDeletePriException(dataBaseType, originalConfig.getString(Key.USERNAME), jdbcUrl);
                     }
@@ -98,7 +100,11 @@ public class CommonRdbmsWriter {
 
                 // 这里的 jdbcUrl 已经 append 了合适后缀参数
                 String jdbcUrl = connConf.getString(Key.JDBC_URL);
+                String jdbcJarUrl = connConf.getString(Key.JDBC_JAR_URL);
+                String driverName = connConf.getString(Key.DRIVER_NAME);
                 originalConfig.set(Key.JDBC_URL, jdbcUrl);
+                originalConfig.set(Key.JDBC_JAR_URL, jdbcJarUrl);
+                originalConfig.set(Key.DRIVER_NAME, driverName);
 
                 String table = connConf.getList(Key.TABLE, String.class).get(0);
                 originalConfig.set(Key.TABLE, table);
@@ -114,7 +120,7 @@ public class CommonRdbmsWriter {
                     originalConfig.remove(Key.PRE_SQL);
 
                     Connection conn = DBUtil.getConnection(dataBaseType,
-                            jdbcUrl, username, password);
+                            jdbcUrl, driverName, jdbcJarUrl, username, password);
                     LOG.info("Begin to execute preSqls:[{}]. context info:{}.",
                             StringUtils.join(renderedPreSqls, ";"), jdbcUrl);
 
@@ -141,6 +147,8 @@ public class CommonRdbmsWriter {
 
                 // 已经由 prepare 进行了appendJDBCSuffix处理
                 String jdbcUrl = originalConfig.getString(Key.JDBC_URL);
+                String jdbcJarUrl = originalConfig.getString(Key.JDBC_JAR_URL);
+                String driverName = originalConfig.getString(Key.DRIVER_NAME);
 
                 String table = originalConfig.getString(Key.TABLE);
 
@@ -154,7 +162,7 @@ public class CommonRdbmsWriter {
                     originalConfig.remove(Key.POST_SQL);
 
                     Connection conn = DBUtil.getConnection(this.dataBaseType,
-                            jdbcUrl, username, password);
+                            jdbcUrl, driverName, jdbcJarUrl, username, password);
 
                     LOG.info(
                             "Begin to execute postSqls:[{}]. context info:{}.",
@@ -180,6 +188,8 @@ public class CommonRdbmsWriter {
         protected String username;
         protected String password;
         protected String jdbcUrl;
+        protected String jdbcJarUrl;
+        protected String driverName;
         protected String table;
         protected List<String> columns;
         protected List<String> preSqls;
@@ -207,6 +217,8 @@ public class CommonRdbmsWriter {
             this.username = writerSliceConfig.getString(Key.USERNAME);
             this.password = writerSliceConfig.getString(Key.PASSWORD);
             this.jdbcUrl = writerSliceConfig.getString(Key.JDBC_URL);
+            this.jdbcJarUrl = writerSliceConfig.getString(Key.JDBC_JAR_URL);
+            this.driverName = writerSliceConfig.getString(Key.DRIVER_NAME);
 
             //ob10的处理
             if (this.jdbcUrl.startsWith(Constant.OB10_SPLIT_STRING) && this.dataBaseType == DataBaseType.MySql) {
@@ -243,7 +255,7 @@ public class CommonRdbmsWriter {
 
         public void prepare(Configuration writerSliceConfig) {
             Connection connection = DBUtil.getConnection(this.dataBaseType,
-                    this.jdbcUrl, username, password);
+                    this.jdbcUrl, this.driverName, this.jdbcJarUrl, username, password);
 
             DBUtil.dealWithSessionConfig(connection, writerSliceConfig,
                     this.dataBaseType, BASIC_MESSAGE);
@@ -313,7 +325,7 @@ public class CommonRdbmsWriter {
                                Configuration writerSliceConfig,
                                TaskPluginCollector taskPluginCollector) {
             Connection connection = DBUtil.getConnection(this.dataBaseType,
-                    this.jdbcUrl, username, password);
+                    this.jdbcUrl, this.driverName, this.jdbcJarUrl, username, password);
             DBUtil.dealWithSessionConfig(connection, writerSliceConfig,
                     this.dataBaseType, BASIC_MESSAGE);
             startWriteWithConnection(recordReceiver, taskPluginCollector, connection);
@@ -330,7 +342,7 @@ public class CommonRdbmsWriter {
             }
 
             Connection connection = DBUtil.getConnection(this.dataBaseType,
-                    this.jdbcUrl, username, password);
+                    this.jdbcUrl, this.driverName, this.jdbcJarUrl, username, password);
 
             LOG.info("Begin to execute postSqls:[{}]. context info:{}.",
                     StringUtils.join(this.postSqls, ";"), BASIC_MESSAGE);

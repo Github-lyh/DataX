@@ -130,13 +130,17 @@ public final class OriginalConfPretreatmentUtil {
     public static void dealColumnConf(Configuration originalConfig) {
         String jdbcUrl = originalConfig.getString(String.format("%s[0].%s",
                 Constant.CONN_MARK, Key.JDBC_URL));
+        String jdbcJarUrl = originalConfig.getString(String.format("%s[0].%s",
+                Constant.CONN_MARK, Key.JDBC_JAR_URL));
+        String driverName = originalConfig.getString(String.format("%s[0].%s",
+                Constant.CONN_MARK, Key.DRIVER_NAME));
 
         String username = originalConfig.getString(Key.USERNAME);
         String password = originalConfig.getString(Key.PASSWORD);
         String oneTable = originalConfig.getString(String.format(
                 "%s[0].%s[0]", Constant.CONN_MARK, Key.TABLE));
 
-        JdbcConnectionFactory jdbcConnectionFactory = new JdbcConnectionFactory(DATABASE_TYPE, jdbcUrl, username, password);
+        JdbcConnectionFactory jdbcConnectionFactory = new JdbcConnectionFactory(DATABASE_TYPE, jdbcUrl, driverName, jdbcJarUrl, username, password);
         dealColumnConf(originalConfig, jdbcConnectionFactory, oneTable);
     }
 

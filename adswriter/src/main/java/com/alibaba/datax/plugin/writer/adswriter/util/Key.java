@@ -5,6 +5,10 @@ public final class Key {
 
     public final static String ADS_URL = "url";
 
+    public final static String DRIVER_NAME = "driverName";
+
+    public final static String JDBC_JAR_URL = "jdbcJarUrl";
+
     public final static String USERNAME = "username";
 
     public final static String PASSWORD = "password";
@@ -21,13 +25,13 @@ public final class Key {
 
 
     public final static String COLUMN = "column";
-    
+
     public final static String OPIndex = "opIndex";
 
     public final static String EMPTY_AS_NULL = "emptyAsNull";
 
     public final static String BATCH_SIZE = "batchSize";
-    
+
     public final static String BUFFER_SIZE = "bufferSize";
 
     public final static String IGNORE_INSERT = "ignoreInsert";
@@ -35,9 +39,9 @@ public final class Key {
     public final static String PRE_SQL = "preSql";
 
     public final static String POST_SQL = "postSql";
-    
+
     public final static String SOCKET_TIMEOUT = "socketTimeout";
-    
+
     public final static String RETRY_CONNECTION_TIME = "retryTimes";
 
     public final static String RETRY_INTERVAL_TIME = "retryIntervalTime";

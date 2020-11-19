@@ -17,6 +17,7 @@ import org.apache.hadoop.hive.ql.io.orc.OrcSerde;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
+import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.CompressionCodec;
@@ -190,6 +191,20 @@ public  class HdfsHelper {
         }
     }
 
+    public void createDir(Path path){
+        LOG.info(String.format("start create tmp dir [%s] .",path.toString()));
+        try {
+            if(!isPathexists(path.toString())) {
+                fileSystem.mkdirs(path);
+            }
+        } catch (Exception e) {
+            String message = String.format("创建临时目录[%s]时发生IO异常,请检查您的网络是否正常！", path.toString());
+            LOG.error(message);
+            throw DataXException.asDataXException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
+        }
+        LOG.info(String.format("finish create tmp dir [%s] .",path.toString()));
+    }
+
     public void deleteDir(Path path){
         LOG.info(String.format("start delete tmp dir [%s] .",path.toString()));
         try {
@@ -320,7 +335,7 @@ public  class HdfsHelper {
 
     public static MutablePair<Text, Boolean> transportOneRecord(
             Record record, char fieldDelimiter, List<Configuration> columnsConfiguration, TaskPluginCollector taskPluginCollector) {
-        MutablePair<List<Object>, Boolean> transportResultList =  transportOneRecord(record,columnsConfiguration,taskPluginCollector);
+        MutablePair<List<Object>, Boolean> transportResultList =  transportOneRecord(record,columnsConfiguration,taskPluginCollector,fieldDelimiter);
         //保存<转换后的数据,是否是脏数据>
         MutablePair<Text, Boolean> transportResult = new MutablePair<Text, Boolean>();
         transportResult.setRight(false);
@@ -361,6 +376,7 @@ public  class HdfsHelper {
      */
     public void orcFileStartWrite(RecordReceiver lineReceiver, Configuration config, String fileName,
                                   TaskPluginCollector taskPluginCollector){
+        char fieldDelimiter = config.getChar(Key.FIELD_DELIMITER);
         List<Configuration>  columns = config.getListConfiguration(Key.COLUMN);
         String compress = config.getString(Key.COMPRESS, null);
         List<String> columnNames = getColumnNames(columns);
@@ -381,7 +397,7 @@ public  class HdfsHelper {
             RecordWriter writer = outFormat.getRecordWriter(fileSystem, conf, fileName, Reporter.NULL);
             Record record = null;
             while ((record = lineReceiver.getFromReader()) != null) {
-                MutablePair<List<Object>, Boolean> transportResult =  transportOneRecord(record,columns,taskPluginCollector);
+                MutablePair<List<Object>, Boolean> transportResult =  transportOneRecord(record,columns,taskPluginCollector,fieldDelimiter);
                 if (!transportResult.getRight()) {
                     writer.write(NullWritable.get(), orcSerde.serialize(transportResult.getLeft(), inspector));
                 }
@@ -447,6 +463,9 @@ public  class HdfsHelper {
                 case BOOLEAN:
                     objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(Boolean.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
                     break;
+                case BINARY:
+                    objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(BytesWritable.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
+                    break;
                 default:
                     throw DataXException
                             .asDataXException(
@@ -479,7 +498,7 @@ public  class HdfsHelper {
 
     public static MutablePair<List<Object>, Boolean> transportOneRecord(
             Record record,List<Configuration> columnsConfiguration,
-            TaskPluginCollector taskPluginCollector){
+            TaskPluginCollector taskPluginCollector,char fieldDelimiter){
 
         MutablePair<List<Object>, Boolean> transportResult = new MutablePair<List<Object>, Boolean>();
         transportResult.setRight(false);
@@ -518,10 +537,13 @@ public  class HdfsHelper {
                             case STRING:
                             case VARCHAR:
                             case CHAR:
-                                recordList.add(column.asString());
+                                recordList.add(column.asString().replace(String.valueOf(fieldDelimiter),"").replace("\n","").replace("\\n",""));
                                 break;
                             case BOOLEAN:
                                 recordList.add(column.asBoolean());
+                                break;
+                            case BINARY:
+                                recordList.add(column.asBytes());
                                 break;
                             case DATE:
                                 recordList.add(new java.sql.Date(column.asDate().getTime()));
@@ -549,7 +571,8 @@ public  class HdfsHelper {
                     }
                 }else {
                     // warn: it's all ok if nullFormat is null
-                    recordList.add(null);
+//                    recordList.add(null);
+                    recordList.add(Constant.DEFAULT_NULL_FORMAT);
                 }
             }
         }

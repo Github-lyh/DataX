@@ -84,12 +84,15 @@ public final class OriginalConfPretreatmentUtil {
             List<String> jdbcUrls = connConf
                     .getList(Key.JDBC_URL, String.class);
 
+            String driverName = connConf.getString(Key.DRIVER_NAME);
+            String jdbcJarUrl = connConf.getString(Key.JDBC_JAR_URL);
+
             String jdbcUrl;
             if (isPreCheck) {
-                jdbcUrl = DBUtil.chooseJdbcUrlWithoutRetry(DATABASE_TYPE, jdbcUrls,
+                jdbcUrl = DBUtil.chooseJdbcUrlWithoutRetry(DATABASE_TYPE, jdbcUrls, driverName, jdbcJarUrl,
                         username, password, preSql, checkSlave);
             } else {
-                jdbcUrl = DBUtil.chooseJdbcUrl(DATABASE_TYPE, jdbcUrls,
+                jdbcUrl = DBUtil.chooseJdbcUrl(DATABASE_TYPE, jdbcUrls, driverName, jdbcJarUrl,
                         username, password, preSql, checkSlave);
             }
 
@@ -149,7 +152,10 @@ public final class OriginalConfPretreatmentUtil {
                 } else {
                     String jdbcUrl = originalConfig.getString(String.format(
                             "%s[0].%s", Constant.CONN_MARK, Key.JDBC_URL));
-
+                    String jdbcJarUrl = originalConfig.getString(String.format(
+                            "%s[0].%s", Constant.CONN_MARK, Key.JDBC_JAR_URL));
+                    String driverName = originalConfig.getString(String.format(
+                            "%s[0].%s", Constant.CONN_MARK, Key.DRIVER_NAME));
                     String username = originalConfig.getString(Key.USERNAME);
                     String password = originalConfig.getString(Key.PASSWORD);
 
@@ -157,7 +163,7 @@ public final class OriginalConfPretreatmentUtil {
                             "%s[0].%s[0]", Constant.CONN_MARK, Key.TABLE));
 
                     List<String> allColumns = DBUtil.getTableColumns(
-                            DATABASE_TYPE, jdbcUrl, username, password,
+                            DATABASE_TYPE, jdbcUrl, driverName, jdbcJarUrl, username, password,
                             tableName);
                     LOG.info("table:[{}] has columns:[{}].",
                             tableName, StringUtils.join(allColumns, ","));

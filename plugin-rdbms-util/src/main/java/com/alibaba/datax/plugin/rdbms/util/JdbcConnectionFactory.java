@@ -11,25 +11,38 @@ public class JdbcConnectionFactory implements ConnectionFactory {
 
     private String jdbcUrl;
 
+    private String jdbcJarUrl;
+
+    private String driverName;
+
     private String userName;
 
     private String password;
 
-    public JdbcConnectionFactory(DataBaseType dataBaseType, String jdbcUrl, String userName, String password) {
+//    public JdbcConnectionFactory(DataBaseType dataBaseType, String jdbcUrl, String userName, String password) {
+//        this.dataBaseType = dataBaseType;
+//        this.jdbcUrl = jdbcUrl;
+//        this.userName = userName;
+//        this.password = password;
+//    }
+
+    public JdbcConnectionFactory(DataBaseType dataBaseType, String jdbcUrl, String driverName, String jdbcJarUrl, String userName, String password) {
         this.dataBaseType = dataBaseType;
         this.jdbcUrl = jdbcUrl;
+        this.driverName = driverName;
+        this.jdbcJarUrl = jdbcJarUrl;
         this.userName = userName;
         this.password = password;
     }
 
     @Override
     public Connection getConnecttion() {
-        return DBUtil.getConnection(dataBaseType, jdbcUrl, userName, password);
+        return DBUtil.getConnection(dataBaseType, jdbcUrl, driverName, jdbcJarUrl, userName, password);
     }
 
     @Override
     public Connection getConnecttionWithoutRetry() {
-        return DBUtil.getConnectionWithoutRetry(dataBaseType, jdbcUrl, userName, password);
+        return DBUtil.getConnectionWithoutRetry(dataBaseType, jdbcUrl, driverName, jdbcJarUrl, userName, password);
     }
 
     @Override

@@ -7,7 +7,9 @@
         "connection": [
             {
                 "table": [],
-                "jdbcUrl": []
+                "jdbcUrl": [],
+                "driverName": "",
+                "jdbcJarUrl": ""
             }
         ]
     }

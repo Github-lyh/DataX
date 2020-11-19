@@ -39,7 +39,7 @@ public class SingleTableSplitUtil {
         String table = configuration.getString(Key.TABLE);
         String where = configuration.getString(Key.WHERE, null);
         boolean hasWhere = StringUtils.isNotBlank(where);
-        
+
         //String splitMode = configuration.getString(Key.SPLIT_MODE, "");
         //if (Constant.SPLIT_MODE_RANDOMSAMPLE.equals(splitMode) && DATABASE_TYPE == DataBaseType.Oracle) {
         if (DATABASE_TYPE == DataBaseType.Oracle) {
@@ -65,7 +65,7 @@ public class SingleTableSplitUtil {
             boolean isLongType = Constant.PK_TYPE_LONG.equals(configuration
                     .getString(Constant.PK_TYPE));
 
-            
+
             if (isStringType) {
                 rangeList = RdbmsRangeSplitWrap.splitAndWrap(
                         String.valueOf(minMaxPK.getLeft()),
@@ -119,7 +119,7 @@ public class SingleTableSplitUtil {
 
         tempConfig.set(Key.QUERY_SQL, tempQuerySql);
         pluginParams.add(tempConfig);
-        
+
         return pluginParams;
     }
 
@@ -144,11 +144,13 @@ public class SingleTableSplitUtil {
 
         int fetchSize = configuration.getInt(Constant.FETCH_SIZE);
         String jdbcURL = configuration.getString(Key.JDBC_URL);
+        String jdbcJarURL = configuration.getString(Key.JDBC_JAR_URL);
+        String driverName = configuration.getString(Key.DRIVER_NAME);
         String username = configuration.getString(Key.USERNAME);
         String password = configuration.getString(Key.PASSWORD);
         String table = configuration.getString(Key.TABLE);
 
-        Connection conn = DBUtil.getConnection(DATABASE_TYPE, jdbcURL, username, password);
+        Connection conn = DBUtil.getConnection(DATABASE_TYPE, jdbcURL, driverName, jdbcJarURL, username, password);
         Pair<Object, Object> minMaxPK = checkSplitPk(conn, pkRangeSQL, fetchSize, table, username, configuration);
         DBUtil.closeDBResources(null, null, conn);
         return minMaxPK;
@@ -261,7 +263,7 @@ public class SingleTableSplitUtil {
         }
         return isValidLongType;
     }
-    
+
     private static boolean isStringType(int type) {
         return type == Types.CHAR || type == Types.NCHAR
                 || type == Types.VARCHAR || type == Types.LONGVARCHAR
@@ -287,7 +289,7 @@ public class SingleTableSplitUtil {
         }
         return pkRangeSQL;
     }
-    
+
     /**
      * support Number and String split
      * */
@@ -313,9 +315,11 @@ public class SingleTableSplitUtil {
 
         int fetchSize = configuration.getInt(Constant.FETCH_SIZE, 32);
         String jdbcURL = configuration.getString(Key.JDBC_URL);
+        String jdbcJarURL = configuration.getString(Key.JDBC_JAR_URL);
+        String driverName = configuration.getString(Key.DRIVER_NAME);
         String username = configuration.getString(Key.USERNAME);
         String password = configuration.getString(Key.PASSWORD);
-        Connection conn = DBUtil.getConnection(DATABASE_TYPE, jdbcURL,
+        Connection conn = DBUtil.getConnection(DATABASE_TYPE, jdbcURL, driverName, jdbcJarURL,
                 username, password);
         LOG.info("split pk [sql={}] is running... ", splitSql);
         ResultSet rs = null;

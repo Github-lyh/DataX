@@ -41,7 +41,7 @@ public class HintUtil {
         }
     }
 
-    public static String buildQueryColumn(String jdbcUrl, String table, String column){
+    public static String buildQueryColumn(String jdbcUrl, String driverName, String jdbcJarUrl, String table, String column){
         try{
             if(tablePattern != null && DataBaseType.Oracle.equals(dataBaseType)) {
                 Matcher m = tablePattern.matcher(table);
@@ -50,7 +50,7 @@ public class HintUtil {
                     String tableWithoutSchema = tableStr[tableStr.length-1];
                     String finalHint = hintExpression.replaceAll(Constant.TABLE_NAME_PLACEHOLDER, tableWithoutSchema);
                     //主库不并发读取
-                    if(finalHint.indexOf("parallel") > 0 && DBUtil.isOracleMaster(jdbcUrl, username, password)){
+                    if(finalHint.indexOf("parallel") > 0 && DBUtil.isOracleMaster(jdbcUrl, driverName, jdbcJarUrl, username, password)){
                         LOG.info("master:{} will not use hint:{}", jdbcUrl, finalHint);
                     }else{
                         LOG.info("table:{} use hint:{}.", table, finalHint);

@@ -89,8 +89,10 @@ public class Adb4pgUtil {
     public static Connection getAdbpgConnect(Configuration conf) {
         String userName = conf.getString(Key.USERNAME);
         String passWord = conf.getString(Key.PASSWORD);
+        String jdbcJarUrl = conf.getString(Key.JDBC_JAR_URL);
+        String driverName = conf.getString(Key.DRIVER_NAME);
 
-        return DBUtil.getConnection(DataBaseType.PostgreSQL, generateJdbcUrl(conf), userName, passWord);
+        return DBUtil.getConnection(DataBaseType.PostgreSQL, generateJdbcUrl(conf), driverName, jdbcJarUrl, userName, passWord);
 
     }
 

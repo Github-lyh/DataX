@@ -139,7 +139,7 @@ public class AdsUtil {
                 .replaceAll(" */ *", ",").replaceAll(" *, *", ",")
                 .replaceAll("'", "").replaceAll(",", "/");
     }
-    
+
     public static String prepareJdbcUrl(Configuration conf) {
         String adsURL = conf.getString(Key.ADS_URL);
         String schema = conf.getString(Key.SCHEMA);
@@ -164,12 +164,14 @@ public class AdsUtil {
         }
         return jdbcUrl;
     }
-    
+
     public static Connection getAdsConnect(Configuration conf) {
         String userName = conf.getString(Key.USERNAME);
         String passWord = conf.getString(Key.PASSWORD);
+        String jdbcJarUrl = conf.getString(Key.JDBC_JAR_URL);
+        String driverName = conf.getString(Key.DRIVER_NAME);
         String jdbcUrl = AdsUtil.prepareJdbcUrl(conf);
-        Connection connection = DBUtil.getConnection(DataBaseType.ADS, jdbcUrl, userName, passWord);
+        Connection connection = DBUtil.getConnection(DataBaseType.ADS, jdbcUrl, driverName, jdbcJarUrl, userName, passWord);
         return connection;
     }
 }
