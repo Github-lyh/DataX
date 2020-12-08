@@ -537,7 +537,7 @@ public  class HdfsHelper {
                             case STRING:
                             case VARCHAR:
                             case CHAR:
-                                recordList.add(column.asString().replace(String.valueOf(fieldDelimiter),"").replace("\n","").replace("\\n",""));
+                                recordList.add(column.asString().replace(String.valueOf(fieldDelimiter),"").replace("\n","").replace("\\n","").replace("\r","").replace("\\r",""));
                                 break;
                             case BOOLEAN:
                                 recordList.add(column.asBoolean());
