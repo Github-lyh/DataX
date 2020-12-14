@@ -407,6 +407,9 @@ public class UnstructuredStorageReaderUtil {
 							break;
 						case INT:
 							try {
+								if(StringUtils.isBlank(columnValue)){
+									columnValue = null;
+								}
 								columnGenerated = new LongColumn(columnValue);
 							} catch (Exception e) {
 								throw new IllegalArgumentException(String.format(
@@ -416,6 +419,9 @@ public class UnstructuredStorageReaderUtil {
 							break;
 						case LONG:
 							try {
+								if(StringUtils.isBlank(columnValue)){
+									columnValue = null;
+								}
 								columnGenerated = new LongColumn(columnValue);
 							} catch (Exception e) {
 								throw new IllegalArgumentException(String.format(
@@ -425,6 +431,9 @@ public class UnstructuredStorageReaderUtil {
 							break;
 						case DOUBLE:
 							try {
+								if(StringUtils.isBlank(columnValue)){
+									columnValue = null;
+								}
 								columnGenerated = new DoubleColumn(columnValue);
 							} catch (Exception e) {
 								throw new IllegalArgumentException(String.format(
