@@ -156,6 +156,10 @@ public class DFSUtil {
         // 获取要读取的文件的根目录
         Path listFiles = new Path(path);
 
+        if(!hdfs.exists(listFiles)){
+            return sourceHDFSAllFilesList;
+        }
+
         // If the network disconnected, this method will retry 45 times
         // each time the retry interval for 20 seconds
         // 获取要读取的文件的根目录的所有二级子文件目录
