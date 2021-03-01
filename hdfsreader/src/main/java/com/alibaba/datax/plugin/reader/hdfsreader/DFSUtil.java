@@ -558,10 +558,10 @@ public class DFSUtil {
             }
 
         } catch (Exception e) {
-            String message = String.format("检查文件[%s]类型失败，目前支持ORC,SEQUENCE,RCFile,TEXT,CSV五种格式的文件," +
-                    "请检查您文件类型和文件是否正确。", filepath);
-            LOG.error(message);
-            throw DataXException.asDataXException(HdfsReaderErrorCode.READ_FILE_ERROR, message, e);
+//            String message = String.format("检查文件[%s]类型失败，目前支持ORC,SEQUENCE,RCFile,TEXT,CSV五种格式的文件," +
+//                    "请检查您文件类型和文件是否正确。", filepath);
+//            LOG.error(message);
+//            throw DataXException.asDataXException(HdfsReaderErrorCode.READ_FILE_ERROR, message, e);
         }
         return false;
     }

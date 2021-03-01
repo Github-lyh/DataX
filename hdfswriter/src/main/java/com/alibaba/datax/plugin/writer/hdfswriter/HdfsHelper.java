@@ -9,6 +9,7 @@ import com.alibaba.datax.common.util.Configuration;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
+import com.jcraft.jsch.jce.AES128CBC;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.hadoop.fs.*;
@@ -510,9 +511,16 @@ public  class HdfsHelper {
                 column = record.getColumn(i);
                 //todo as method
                 if (null != column.getRawData()) {
+                    // 获取字段数据
                     String rowData = column.getRawData().toString();
+                    // 获取字段类型
                     SupportHiveDataType columnType = SupportHiveDataType.valueOf(
                             columnsConfiguration.get(i).getString(Key.TYPE).toUpperCase());
+                    // replace
+                    // substr
+                    // encrypt
+                    String encrypt = columnsConfiguration.get(i).getString(Key.ENCRYPT);
+
                     //根据writer端类型配置做类型转换
                     try {
                         switch (columnType) {
@@ -537,7 +545,13 @@ public  class HdfsHelper {
                             case STRING:
                             case VARCHAR:
                             case CHAR:
-                                recordList.add(column.asString().replace(String.valueOf(fieldDelimiter),"").replace("\n","").replace("\\n","").replace("\r","").replace("\\r",""));
+                                String temp = column.asString().replace(String.valueOf(fieldDelimiter),"").replace("\n","").replace("\\n","").replace("\r","").replace("\\r","");
+                                if(StringUtils.isNotBlank(encrypt)){
+                                    if("AES".equalsIgnoreCase(encrypt)){
+                                        temp = AESUtil.encrypt(temp);
+                                    }
+                                }
+                                recordList.add(temp);
                                 break;
                             case BOOLEAN:
                                 recordList.add(column.asBoolean());
