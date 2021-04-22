@@ -191,12 +191,13 @@ public class DFSUtil {
             LOG.info(String.format("[%s]是[%s]类型的文件, 将该文件加入source files列表", filePath, this.specifiedFileType));
             sourceHDFSAllFilesList.add(filePath);
         } else {
+            // 文件类型如果不对，输出日志，但不抛出异常
             String message = String.format("文件[%s]的类型与用户配置的fileType类型不一致，" +
                             "请确认您配置的目录下面所有文件的类型均为[%s]"
                     , filePath, this.specifiedFileType);
             LOG.error(message);
-            throw DataXException.asDataXException(
-                    HdfsReaderErrorCode.FILE_TYPE_UNSUPPORT, message);
+//            throw DataXException.asDataXException(
+//                    HdfsReaderErrorCode.FILE_TYPE_UNSUPPORT, message);
         }
     }
 
