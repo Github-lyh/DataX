@@ -545,7 +545,11 @@ public  class HdfsHelper {
                             case STRING:
                             case VARCHAR:
                             case CHAR:
-                                String temp = column.asString().replace(String.valueOf(fieldDelimiter),"").replace("\n","").replace("\\n","").replace("\r","").replace("\\r","").trim();
+                                String temp = column.asString().replace(String.valueOf(fieldDelimiter),"")
+                                        .replace("\n","").replace("\\n","")
+                                        .replace("\r","").replace("\\r","")
+                                        .replace("\t","").replace("\\t","")
+                                        .trim();
                                 if(StringUtils.isNotBlank(encrypt) && StringUtils.isNotBlank(temp)){
                                     if("AES".equalsIgnoreCase(encrypt)){
                                         temp = AESUtil.encrypt(temp);
