@@ -21,6 +21,7 @@ import java.util.Map;
 public class Hbase11xHelper {
 
     private static final Logger LOG = LoggerFactory.getLogger(Hbase11xHelper.class);
+    private volatile static org.apache.hadoop.hbase.client.Connection h_Connection = null;
 
     public static org.apache.hadoop.conf.Configuration getHbaseConfiguration(String hbaseConfig) {
         if (StringUtils.isBlank(hbaseConfig)) {
@@ -41,17 +42,24 @@ public class Hbase11xHelper {
     }
 
     public static org.apache.hadoop.hbase.client.Connection getHbaseConnection(String hbaseConfig) {
-        org.apache.hadoop.conf.Configuration hConfiguration = Hbase11xHelper.getHbaseConfiguration(hbaseConfig);
-
-        org.apache.hadoop.hbase.client.Connection hConnection = null;
         try {
-            hConnection = ConnectionFactory.createConnection(hConfiguration);
-
+            if(h_Connection != null && !h_Connection.isClosed()){
+                return h_Connection;
+            }else{
+                synchronized (h_Connection){
+                    if(h_Connection != null && !h_Connection.isClosed()){
+                        return h_Connection;
+                    }else{
+                        org.apache.hadoop.conf.Configuration hConfiguration = Hbase11xHelper.getHbaseConfiguration(hbaseConfig);
+                        h_Connection = ConnectionFactory.createConnection(hConfiguration);
+                    }
+                }
+            }
         } catch (Exception e) {
-            Hbase11xHelper.closeConnection(hConnection);
+            Hbase11xHelper.closeConnection(h_Connection);
             throw DataXException.asDataXException(Hbase11xWriterErrorCode.GET_HBASE_CONNECTION_ERROR, e);
         }
-        return hConnection;
+        return h_Connection;
     }
 
 
