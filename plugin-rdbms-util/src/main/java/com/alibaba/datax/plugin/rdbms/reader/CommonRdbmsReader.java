@@ -230,11 +230,11 @@ public class CommonRdbmsReader {
         public void destroy(Configuration originalConfig) {
             // do nothing
         }
-        
-        protected Record transportOneRecord(RecordSender recordSender, ResultSet rs, 
-                ResultSetMetaData metaData, int columnNumber, String mandatoryEncoding, 
+
+        protected Record transportOneRecord(RecordSender recordSender, ResultSet rs,
+                ResultSetMetaData metaData, int columnNumber, String mandatoryEncoding,
                 TaskPluginCollector taskPluginCollector) {
-            Record record = buildRecord(recordSender,rs,metaData,columnNumber,mandatoryEncoding,taskPluginCollector); 
+            Record record = buildRecord(recordSender,rs,metaData,columnNumber,mandatoryEncoding,taskPluginCollector);
             recordSender.sendToWriter(record);
             return record;
         }
@@ -256,9 +256,15 @@ public class CommonRdbmsReader {
                         if(StringUtils.isBlank(mandatoryEncoding)){
                             rawData = rs.getString(i);
                         }else{
-                            rawData = new String((rs.getBytes(i) == null ? EMPTY_CHAR_ARRAY : 
+                            rawData = new String((rs.getBytes(i) == null ? EMPTY_CHAR_ARRAY :
                                 rs.getBytes(i)), mandatoryEncoding);
                         }
+                        // 去掉文本中的换行和制表符
+                        rawData = rawData
+                                .replace("\n", "").replace("\\n", "")
+                                .replace("\r", "").replace("\\r", "")
+                                .replace("\t", "").replace("\\t", "")
+                                .trim();
                         record.addColumn(new StringColumn(rawData));
                         break;
 
@@ -300,6 +306,14 @@ public class CommonRdbmsReader {
 
                     case Types.TIMESTAMP:
                         record.addColumn(new DateColumn(rs.getTimestamp(i)));
+                        break;
+
+                    case Types.OTHER:
+                        if (metaData.getColumnTypeName(i).contains("DateTime")) {
+                            record.addColumn(new DateColumn(rs.getTimestamp(i)));
+                        } else {
+                            record.addColumn(new StringColumn(rs.getString(i)));
+                        }
                         break;
 
                     case Types.BINARY:

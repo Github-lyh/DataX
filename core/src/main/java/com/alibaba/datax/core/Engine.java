@@ -198,6 +198,12 @@ public class Engine {
     public static void main(String[] args) throws Exception {
         int exitCode = 0;
         try {
+            if(args == null || args.length == 0){
+                // 设置运行的datax的家目录
+                System.setProperty("datax.home", "D:\\Workspace\\github\\Datax\\target\\datax\\datax");
+                //设置datax的运行脚本信息
+                args = new String[]{"-mode", "standalone", "-jobid", "-1", "-job", "D:\\Workspace\\github\\Datax\\job.json"};
+            }
             Engine.entry(args);
         } catch (Throwable e) {
             exitCode = 1;

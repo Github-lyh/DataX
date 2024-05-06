@@ -432,8 +432,13 @@ public class CommonRdbmsWriter {
                 case Types.LONGVARCHAR:
                 case Types.NVARCHAR:
                 case Types.LONGNVARCHAR:
-                    preparedStatement.setString(columnIndex + 1, column
-                            .asString());
+                    // 去掉文本中的换行和制表符
+                    String rawData = column.asString() != null ? column.asString()
+                            .replace("\n", "").replace("\\n", "")
+                            .replace("\r", "").replace("\\r", "")
+                            .replace("\t", "").replace("\\t", "")
+                            .trim() : column.asString();
+                    preparedStatement.setString(columnIndex + 1, rawData);
                     break;
 
                 case Types.SMALLINT:

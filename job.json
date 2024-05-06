@@ -1,0 +1,101 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 3,
+        "byte": -1
+      },
+      "errorLimit": {
+        "record": 0,
+        "percentage": 0.02
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "clickhousereader",
+          "parameter": {
+            "column": [
+              "`create_date`",
+              "`reader_id`",
+              "`reg_date`",
+              "`expire_date`",
+              "`card_bgn_date`",
+              "`card_end_date`",
+              "`name`",
+              "`gender`",
+              "`id_card`",
+              "`birthday`",
+              "`pwd`",
+              "`reader_barcode`",
+              "`reader_type`",
+              "`reader_status`",
+              "`card_status`",
+              "`address`",
+              "`telephone`",
+              "`email`",
+              "`postcode`",
+              "`education`",
+              "`dept_name`",
+              "`group_code`",
+              "`lib_code`"
+            ],
+            "connection": [
+              {
+                "driverName": "ru.yandex.clickhouse.ClickHouseDriver",
+                "jdbcUrl": [
+                  "jdbc:clickhouse://nt07:8123/nantu?socket_timeout=-1&keepAliveTimeout=-1"
+                ],
+                "table": [
+                  "reader"
+                ]
+              }
+            ],
+            "password": "nantu2020.",
+            "splitPk": "",
+            "username": "default"
+          }
+        },
+        "writer": {
+          "name": "starrockswriter",
+          "parameter": {
+            "column": [
+              "`create_date`",
+              "`reader_id`",
+              "`reg_date`",
+              "`expire_date`",
+              "`card_bgn_date`",
+              "`card_end_date`",
+              "`name`",
+              "`gender`",
+              "`id_card`",
+              "`birthday`",
+              "`pwd`",
+              "`reader_barcode`",
+              "`reader_type`",
+              "`reader_status`",
+              "`card_status`",
+              "`address`",
+              "`telephone`",
+              "`email`",
+              "`postcode`",
+              "`education`",
+              "`dept_name`",
+              "`group_code`",
+              "`lib_code`"
+            ],
+            "database": "nantu",
+            "jdbcUrl": "jdbc:mysql://nt07:29030/nantu",
+            "loadProps": {},
+            "loadUrl": [
+              "nt07:28030"
+            ],
+            "password": "nantu2020.",
+            "table": "reader",
+            "username": "root"
+          }
+        }
+      }
+    ]
+  }
+}
