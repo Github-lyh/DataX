@@ -260,11 +260,13 @@ public class CommonRdbmsReader {
                                 rs.getBytes(i)), mandatoryEncoding);
                         }
                         // 去掉文本中的换行和制表符
-                        rawData = rawData
-                                .replace("\n", "").replace("\\n", "")
-                                .replace("\r", "").replace("\\r", "")
-                                .replace("\t", "").replace("\\t", "")
-                                .trim();
+                        if(StringUtils.isNotBlank(rawData)){
+                            rawData = rawData
+                                    .replace("\n", "").replace("\\n", "")
+                                    .replace("\r", "").replace("\\r", "")
+                                    .replace("\t", "").replace("\\t", "")
+                                    .trim();
+                        }
                         record.addColumn(new StringColumn(rawData));
                         break;
 
